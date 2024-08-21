@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "=3.0.0"
     }
+    ansible = {
+      version = "~> 1.3.0"
+      source  = "ansible/ansible"
+    }
   }
 }
 
@@ -124,5 +128,43 @@ resource "azurerm_linux_virtual_machine" "example-vm" {
     sku       = "server"
     version   = "latest"
   }
+
+  tags = {
+    environment = "dev"
+  }
+}
+
+# Ansible Section
+
+resource "time_sleep" "wait_30_seconds" {
+  depends_on      = [azurerm_linux_virtual_machine.example-vm]
+  create_duration = "30s"
+}
+
+resource "ansible_host" "azure_instance" {
+  name   = azurerm_linux_virtual_machine.example-vm.public_ip_address
+  groups = ["webservers"]
+  variables = {
+    ansible_user                 = "adminuser"
+    ansible_ssh_private_key_file = "~/.ssh/exampleazurekey"
+  }
+
+  depends_on = [time_sleep.wait_30_seconds]
+}
+
+resource "terraform_data" "ansible_inventory" {
+  provisioner "local-exec" {
+    command = "ansible-inventory -i ./ansible/inventory.yml --graph"
+  }
+
+  depends_on = [ansible_host.azure_instance]
+}
+
+resource "terraform_data" "ansible_playbook" {
+  provisioner "local-exec" {
+    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./ansible/inventory.yml ./ansible/webservers.yml"
+  }
+
+  depends_on = [terraform_data.ansible_inventory]
 }
 
