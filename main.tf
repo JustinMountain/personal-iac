@@ -16,8 +16,8 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "example-rg" {
-  name     = "can-example-resources"
-  location = "Canada East"
+  name     = "${var.resource_group_name}"
+  location = "${var.region}"
 
   tags = {
     environment = "dev"
@@ -25,10 +25,10 @@ resource "azurerm_resource_group" "example-rg" {
 }
 
 resource "azurerm_virtual_network" "example-vn" {
-  name                = "can-example-network"
+  name                = "${var.virtual_network_name}"
   resource_group_name = azurerm_resource_group.example-rg.name
   location            = azurerm_resource_group.example-rg.location
-  address_space       = ["10.1.0.0/16"]
+  address_space       = ["${var.address_space}"]
 
   tags = {
     environment = "dev"
@@ -36,14 +36,14 @@ resource "azurerm_virtual_network" "example-vn" {
 }
 
 resource "azurerm_subnet" "example-subnet" {
-  name                 = "can-example-subnet"
+  name                 = "${var.subnet_name}"
   resource_group_name  = azurerm_resource_group.example-rg.name
   virtual_network_name = azurerm_virtual_network.example-vn.name
-  address_prefixes     = ["10.1.1.0/24"]
+  address_prefixes     = ["${var.subnet_address}"]
 }
 
 resource "azurerm_network_security_group" "example-sg" {
-  name                = "can-example-security-group"
+  name                = "${var.security_group_name}"
   location            = azurerm_resource_group.example-rg.location
   resource_group_name = azurerm_resource_group.example-rg.name
 
@@ -53,14 +53,14 @@ resource "azurerm_network_security_group" "example-sg" {
 }
 
 resource "azurerm_network_security_rule" "example-dev-rule" {
-  name                        = "can-example-dev-security-rule"
+  name                        = "${var.security_rule_1_name}"
   priority                    = 100
-  direction                   = "Inbound" # Azure uses deny by default
+  direction                   = "Inbound"                             # Azure uses deny by default
   access                      = "Allow"
   protocol                    = "*"
   source_port_range           = "*"
   destination_port_range      = "*"
-  source_address_prefix       = "*"       # Restrict to IP
+  source_address_prefix       = "${var.security_rule_1_source_ip}"   # Restrict to IP
   destination_address_prefix  = "*"
   resource_group_name         = azurerm_resource_group.example-rg.name
   network_security_group_name = azurerm_network_security_group.example-sg.name
@@ -72,7 +72,7 @@ resource "azurerm_subnet_network_security_group_association" "example-sga" {
 }
 
 resource "azurerm_public_ip" "example-ip" {
-  name                = "can-example-ip-1"
+  name                = "${var.public_ip_name}"
   resource_group_name = azurerm_resource_group.example-rg.name
   location            = azurerm_resource_group.example-rg.location
   allocation_method   = "Dynamic"
@@ -83,7 +83,7 @@ resource "azurerm_public_ip" "example-ip" {
 }
 
 resource "azurerm_network_interface" "example-nic" {
-  name                = "can-example-nic-1"
+  name                = "${var.network_interface_name}"
   resource_group_name = azurerm_resource_group.example-rg.name
   location            = azurerm_resource_group.example-rg.location
 
@@ -100,18 +100,18 @@ resource "azurerm_network_interface" "example-nic" {
 }
 
 resource "azurerm_linux_virtual_machine" "example-vm" {
-  name                = "can-example-vm-1"
+  name                = "${var.vm_name}"
   resource_group_name = azurerm_resource_group.example-rg.name
   location            = azurerm_resource_group.example-rg.location
-  size                = "Standard_B1s"
-  admin_username      = "adminuser"
+  size                = "${var.vm_size}"
+  admin_username      = "${var.vm_admin_username}"
   network_interface_ids = [
     azurerm_network_interface.example-nic.id
   ]
 
   admin_ssh_key {
-    username   = "adminuser"
-    public_key = file("~/.ssh/exampleazurekey.pub")
+    username   = "${var.vm_admin_username}"
+    public_key = file("${var.vm_ssh_key_location}")
   }
 
   os_disk {
@@ -120,10 +120,10 @@ resource "azurerm_linux_virtual_machine" "example-vm" {
   }
 
   source_image_reference {
-    publisher = "Canonical"
-    offer     = "ubuntu-24_04-lts"
-    sku       = "server"
-    version   = "latest"
+    publisher = "${var.vm_image_publisher}"
+    offer     = "${var.vm_image_offer}"
+    sku       = "${var.vm_image_sku}"
+    version   = "${var.vm_image_version}"
   }
 
   tags = {
@@ -142,8 +142,8 @@ resource "ansible_host" "azure_instance" {
   name   = azurerm_linux_virtual_machine.example-vm.public_ip_address
   groups = ["webservers"]
   variables = {
-    ansible_user                 = "adminuser"
-    ansible_ssh_private_key_file = "~/.ssh/exampleazurekey"
+    ansible_user                 = "${var.vm_admin_username}"
+    ansible_ssh_private_key_file = "${var.ssh_private_key_location}"
   }
 
   depends_on = [time_sleep.wait_30_seconds]
