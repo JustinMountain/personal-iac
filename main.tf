@@ -33,9 +33,6 @@ resource "azurerm_virtual_network" "example-vn" {
   tags = {
     environment = "dev"
   }
-
-  # Set an explicit dependency
-  # depends_on = [azurerm_resource_group.example-rg]
 }
 
 resource "azurerm_subnet" "example-subnet" {
@@ -160,7 +157,13 @@ resource "terraform_data" "ansible_inventory" {
   depends_on = [ansible_host.azure_instance]
 }
 
+data "local_file" "ansible_playbook" {
+  filename = "./ansible/webservers.yml"
+}
+
 resource "terraform_data" "ansible_playbook" {
+  input = data.local_file.ansible_playbook.content_md5
+  
   provisioner "local-exec" {
     command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./ansible/inventory.yml ./ansible/webservers.yml"
   }
@@ -168,3 +171,12 @@ resource "terraform_data" "ansible_playbook" {
   depends_on = [terraform_data.ansible_inventory]
 }
 
+# Creates a data object in the state file for reference
+data "azurerm_public_ip" "example-ip-data" {
+  name                = azurerm_public_ip.example-ip.name
+  resource_group_name = azurerm_resource_group.example-rg.name
+}
+
+output "public_ip_address" {
+  value = "${azurerm_linux_virtual_machine.example-vm.name}: ${data.azurerm_public_ip.example-ip-data.ip_address}"
+}
