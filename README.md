@@ -1,5 +1,9 @@
 # Personal Site Infrastructure as Code
 
-The repo has been initialized to create a bare-bones Ubunutu 24.04 server in Azure.
+As of 2024/08/22:
 
-As of 2024/08/19, a VM is created with a virtual NIC and security groups that allow SSH access.
+1) Terraform creates an Azure VM
+2) Ansible files are captured by Terraform state
+3) Docker is initialized to the VM using Ansible
+4) Nginx container is deployed
+5) Any changes made to above infrastructure is deployed with `terraform apply`
