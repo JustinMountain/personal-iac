@@ -161,9 +161,21 @@ data "local_file" "ansible_playbook" {
   filename = "./ansible/webservers.yml"
 }
 
-resource "terraform_data" "ansible_playbook" {
-  input = data.local_file.ansible_playbook.content_md5
-  
+data "local_file" "nginx_compose" {
+  filename = "./docker/nginx/compose.yml"
+}
+
+data "local_file" "watchtower_compose" {
+  filename = "./docker/watchtower/compose.yml"
+}
+
+resource "null_resource" "ansible_playbook" {
+  triggers = {
+    playbook_hash = data.local_file.ansible_playbook.content_md5
+    nginx_hash  = data.local_file.nginx_compose.content_md5
+    watchtower_hash  = data.local_file.watchtower_compose.content_md5
+  }
+
   provisioner "local-exec" {
     command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./ansible/inventory.yml ./ansible/webservers.yml"
   }

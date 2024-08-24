@@ -1,0 +1,16 @@
+---
+services:
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    #  - /root/.docker/config.json:/config.json # Used with private repos
+    environment:
+      TZ: America/Toronto
+      WATCHTOWER_CLEANUP: true                  # Remove old images after update
+      WATCHTOWER_SCHEDULE: "0 0 1 * * *"        # Cron interval to check for updates
+      WATCHTOWER_ROLLING_RESTART: true          # Prevents all containers updating at once
+      WATCHTOWER_TIMEOUT: 30s
+      # WATCHTOWER_DISABLE_CONTAINERS: "traefik"  # Supercedes labels
+      # WATCHTOWER_MONITOR_ONLY: true             # Prevents updates automatically being applied
+    restart: unless-stopped

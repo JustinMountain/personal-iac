@@ -10,3 +10,7 @@
     - role: compose_up
       vars:
         stack_name: "nginx"
+
+    - role: compose_up
+      vars:
+        stack_name: "watchtower"
