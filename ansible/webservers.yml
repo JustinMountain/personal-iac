@@ -13,4 +13,8 @@
 
     - role: compose_up
       vars:
+        stack_name: "blog"
+
+    - role: compose_up
+      vars:
         stack_name: "watchtower"
