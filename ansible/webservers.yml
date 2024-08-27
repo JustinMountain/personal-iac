@@ -9,7 +9,7 @@
 
     - role: compose_up
       vars:
-        stack_name: "nginx"
+        stack_name: "traefik"
 
     - role: compose_up
       vars:

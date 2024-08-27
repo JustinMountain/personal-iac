@@ -5,57 +5,70 @@
     state: directory
     mode: 0755
 
+- name: Check if {{ stack_name }} requires .env file
+  delegate_to: localhost
+  stat:
+    path: "~/personal-iac/docker/{{ stack_name }}/.env"
+  register: env_file
+
+- name: Copy {{ stack_name }} .env to remote host
+  ansible.builtin.copy:
+    src: "~/personal-iac/docker/{{ stack_name }}/.env"
+    dest: "~/{{ stack_name }}/.env"
+    mode: 0644
+  when: env_file.stat.exists
+
 - name: Copy {{ stack_name }} compose.yml to remote host
   ansible.builtin.copy:
     src: "~/personal-iac/docker/{{ stack_name }}/compose.yml"
     dest: "~/{{ stack_name }}/compose.yml"
     mode: 0755
 
-# - name: Check if {{ stack_name }}/data exists on host
-#   delegate_to: localhost
-#   stat:
-#     path: "~/personal-iac/docker/{{ stack_name }}/data"
-#   register: data_dir
+- name: Check if {{ stack_name }}/data exists on host
+  delegate_to: localhost
+  stat:
+    path: "~/personal-iac/docker/{{ stack_name }}/data"
+  register: data_dir
  
-# - name: Find files in {{ stack_name }}/data
-#   delegate_to: localhost
-#   find:
-#     paths: "~/personal-iac/docker/{{ stack_name }}/data"
-#     recurse: yes
-#   register: files_to_copy
-#   when: data_dir.stat.exists
+- name: Find files in {{ stack_name }}/data
+  delegate_to: localhost
+  find:
+    paths: "~/personal-iac/docker/{{ stack_name }}/data"
+    recurse: yes
+  register: files_to_copy
+  when: data_dir.stat.exists
 
-# - name: Create a directory for {{ stack_name }}/data on remote
-#   ansible.builtin.file:
-#     path: "~/{{ stack_name }}/{{ stack_name }}" 
-#     state: directory
-#     mode: 0755
-#   when: data_dir.stat.exists
+- name: Create a directory for {{ stack_name }}/data on remote
+  ansible.builtin.file:
+    path: "~/{{ stack_name }}/{{ stack_name }}" 
+    state: directory
+    mode: 0755
+  when: data_dir.stat.exists
 
-# - name: Check if acme.json file is present on remote (for traefik)
-#   stat:
-#     path: "~/{{ stack_name }}/{{ stack_name }}/acme.json"
-#   register: acme_json
-#   when: stack_name == 'traefik'
+- name: Check if acme.json file is present on remote (for traefik)
+  stat:
+    path: "~/{{ stack_name }}/{{ stack_name }}/acme.json"
+  register: acme_json
+  when: stack_name == 'traefik'
 
-# - name: Create acme.json file when not found on remote (for traefik)
-#   ansible.builtin.file:
-#     path: "~/{{ stack_name }}/{{ stack_name }}/acme.json"
-#     state: touch
-#     mode: 0600
-#   when: 
-#     - data_dir.stat.exists
-#     - stack_name == 'traefik'
-#     - not acme_json.stat.exists
+- name: Create acme.json file when not found on remote (for traefik)
+  ansible.builtin.file:
+    path: "~/{{ stack_name }}/{{ stack_name }}/acme.json"
+    state: touch
+    mode: 0600
+  when: 
+    - data_dir.stat.exists
+    - stack_name == 'traefik'
+    - not acme_json.stat.exists
 
-# - name: Copy {{ stack_name }}/data contents to remote
-#   copy:
-#     src: "{{ item.path }}"
-#     dest: "~/{{ stack_name }}/{{ stack_name }}"
-#   with_items: "{{ files_to_copy.files }}"
-#   when:
-#     - data_dir.stat.exists
-#     - item.path | basename != 'acme.json'
+- name: Copy {{ stack_name }}/data contents to remote
+  copy:
+    src: "{{ item.path }}"
+    dest: "~/{{ stack_name }}/{{ stack_name }}"
+  with_items: "{{ files_to_copy.files }}"
+  when:
+    - data_dir.stat.exists
+    - item.path | basename != 'acme.json'
 
 - name: Create Docker network 'proxy' if it does not exist
   community.docker.docker_network:

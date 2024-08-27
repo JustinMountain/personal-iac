@@ -20,7 +20,7 @@ resource "azurerm_resource_group" "example-rg" {
   location = "${var.region}"
 
   tags = {
-    environment = "dev"
+    environment = "prod"
   }
 }
 
@@ -31,7 +31,7 @@ resource "azurerm_virtual_network" "example-vn" {
   address_space       = ["${var.address_space}"]
 
   tags = {
-    environment = "dev"
+    environment = "prod"
   }
 }
 
@@ -48,11 +48,11 @@ resource "azurerm_network_security_group" "example-sg" {
   resource_group_name = azurerm_resource_group.example-rg.name
 
   tags = {
-    environment = "dev"
+    environment = "prod"
   }
 }
 
-resource "azurerm_network_security_rule" "example-dev-rule" {
+resource "azurerm_network_security_rule" "example-sec-rule" {
   name                        = "${var.security_rule_1_name}"
   priority                    = 100
   direction                   = "Inbound"                             # Azure uses deny by default
@@ -78,7 +78,7 @@ resource "azurerm_public_ip" "example-ip" {
   allocation_method   = "Dynamic"
 
   tags = {
-    environment = "dev"
+    environment = "prod"
   }
 }
 
@@ -95,7 +95,7 @@ resource "azurerm_network_interface" "example-nic" {
   }
 
   tags = {
-    environment = "dev"
+    environment = "prod"
   }
 }
 
@@ -127,7 +127,7 @@ resource "azurerm_linux_virtual_machine" "example-vm" {
   }
 
   tags = {
-    environment = "dev"
+    environment = "prod"
   }
 }
 
@@ -161,8 +161,12 @@ data "local_file" "ansible_playbook" {
   filename = "./ansible/webservers.yml"
 }
 
-data "local_file" "nginx_compose" {
-  filename = "./docker/nginx/compose.yml"
+data "local_file" "traefik_compose" {
+  filename = "./docker/traefik/compose.yml"
+}
+
+data "local_file" "blog_compose" {
+  filename = "./docker/blog/compose.yml"
 }
 
 data "local_file" "watchtower_compose" {
@@ -172,7 +176,8 @@ data "local_file" "watchtower_compose" {
 resource "null_resource" "ansible_playbook" {
   triggers = {
     playbook_hash = data.local_file.ansible_playbook.content_md5
-    nginx_hash  = data.local_file.nginx_compose.content_md5
+    traefik_hash  = data.local_file.traefik_compose.content_md5
+    blog_hash  = data.local_file.blog_compose.content_md5
     watchtower_hash  = data.local_file.watchtower_compose.content_md5
   }
 

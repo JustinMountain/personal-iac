@@ -3,4 +3,16 @@ services:
   watchtower:
     image: mountjustin/personal-blog:latest
     container_name: blog
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.blog.rule=Host(`justinmountain.com`) || Host(`blog.justinmountain.com`) || Host(`www.justinmountain.com`)"
+      - "traefik.http.routers.blog.entrypoints=https"
+      - "traefik.http.routers.blog.tls=true"
+      - "traefik.http.services.blog.loadbalancer.server.port=3000"  
+    networks:
+      - proxy
     restart: unless-stopped
+
+networks:
+  proxy:
+    external: true
