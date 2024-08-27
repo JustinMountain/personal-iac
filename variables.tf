@@ -1,97 +1,97 @@
 # Resource Group
 variable "resource_group_name" {
   type = string
-  # default = "can-example-resources"
+  default = "personal-iac-1"
 }
 variable "region" {
   type = string
-  # default = "Canada East"
+  default = "Canada East"
 }
 
 # Virtual Network
 variable "virtual_network_name" {
   type = string
-  # default = "can-example-network"
+  default = "personal-iac-vn-1"
 }
 variable "address_space" {
   type = string
-  # default = "10.1.0.0/16"
+  default = "10.1.0.0/16"
 }
 
 # Subnet
 variable "subnet_name" {
   type = string
-  # default = "can-example-subnet"
+  default = "personal-iac-subnet-1"
 }
 variable "subnet_address" {
   type = string
-  # default = "10.1.1.0/24"
+  default = "10.1.1.0/24"
 }
 
 # Security Group
 variable "security_group_name" {
   type = string
-  # default = "can-example-security-group"
+  default = "personal-iac-sg-1"
 }
 
 # Network Security Rules
 variable "security_rule_1_name" {
   type = string
-  # default = "can-example-dev-security-rule"
+  default = "personal-iac-security-rule-1"
 }
 variable "security_rule_1_source_ip" {
   type = string
-  # default = "*"
+  default = "*"     # Accessible from anywhere
 }
 
 # Public IP
 variable "public_ip_name" {
   type = string
-  # default = "can-example-ip-1"
+  default = "personal-iac-ip-1"
 }
 
 # Network Interface
 variable "network_interface_name" {
   type = string
-  # default = "can-example-nic-1"
+  default = "personal-iac-nic-1"
 }
 
 # Virtual Machine
 variable "vm_name" {
   type = string
-  # default = "can-example-vm-1"
+  default = "personal-iac-vm-1"
 }
 variable "vm_size" {
   type = string
-  # default = "Standard_B1s"
+  default = "Standard_B1s"
 }
 variable "vm_admin_username" {
   type = string
-  # default = "adminuser"
+  default = "adminuser"
 }
 variable "vm_ssh_key_location" {
   type = string
-  # default = "~/.ssh/exampleazurekey.pub"
+  default = "~/.ssh/exampleazurekey.pub"
 }
 variable "vm_image_publisher" {
   type = string
-  # default = "Canonical"
+  default = "Canonical"
 }
 variable "vm_image_offer" {
   type = string
-  # default = "ubuntu-24_04-lts"
+  default = "ubuntu-24_04-lts"
 }
 variable "vm_image_sku" {
   type = string
-  # default = "server"
+  default = "server"
 }
 variable "vm_image_version" {
   type = string
-  # default = "latest"
+  default = "latest"
 }
 
 # Ansible
 variable "ssh_private_key_location" {
   type = string
-  # default = "~/.ssh/exampleazurekey"
+  default = "~/.ssh/exampleazurekey"
 }
