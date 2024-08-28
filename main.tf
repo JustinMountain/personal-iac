@@ -116,10 +116,10 @@ resource "azurerm_linux_virtual_machine" "personal-iac-vm-1" {
     azurerm_network_interface.personal-iac-nic-1.id
   ]
 
-  admin_ssh_key {
-    username   = var.vm_admin_username
-    public_key = file("${var.vm_ssh_key_location}")
-  }
+  # admin_ssh_key {
+  #   username   = var.vm_admin_username
+  #   public_key = file("${var.vm_ssh_key_location}")
+  # }
 
   os_disk {
     caching              = "ReadWrite"
