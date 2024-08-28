@@ -1,7 +1,7 @@
 # Resource Group
 variable "resource_group_name" {
   type    = string
-  default = "personal-iac-1"
+  default = "personal-iac-rg-1"
 }
 variable "region" {
   type    = string

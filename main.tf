@@ -31,112 +31,112 @@ resource "azurerm_resource_group" "personal-iac-rg-1" {
   }
 }
 
-# resource "azurerm_virtual_network" "personal-iac-vn-1" {
-#   name                = "${var.virtual_network_name}"
-#   resource_group_name = azurerm_resource_group.personal-iac-rg-1.name
-#   location            = azurerm_resource_group.personal-iac-rg-1.location
-#   address_space       = ["${var.address_space}"]
+resource "azurerm_virtual_network" "personal-iac-vn-1" {
+  name                = "${var.virtual_network_name}"
+  resource_group_name = azurerm_resource_group.personal-iac-rg-1.name
+  location            = azurerm_resource_group.personal-iac-rg-1.location
+  address_space       = ["${var.address_space}"]
 
-#   tags = {
-#     environment = "prod"
-#   }
-# }
+  tags = {
+    environment = "prod"
+  }
+}
 
-# resource "azurerm_subnet" "personal-iac-subnet-1" {
-#   name                 = "${var.subnet_name}"
-#   resource_group_name  = azurerm_resource_group.personal-iac-rg-1.name
-#   virtual_network_name = azurerm_virtual_network.personal-iac-vn-1.name
-#   address_prefixes     = ["${var.subnet_address}"]
-# }
+resource "azurerm_subnet" "personal-iac-subnet-1" {
+  name                 = "${var.subnet_name}"
+  resource_group_name  = azurerm_resource_group.personal-iac-rg-1.name
+  virtual_network_name = azurerm_virtual_network.personal-iac-vn-1.name
+  address_prefixes     = ["${var.subnet_address}"]
+}
 
-# resource "azurerm_network_security_group" "personal-iac-sg-1" {
-#   name                = "${var.security_group_name}"
-#   location            = azurerm_resource_group.personal-iac-rg-1.location
-#   resource_group_name = azurerm_resource_group.personal-iac-rg-1.name
+resource "azurerm_network_security_group" "personal-iac-sg-1" {
+  name                = "${var.security_group_name}"
+  location            = azurerm_resource_group.personal-iac-rg-1.location
+  resource_group_name = azurerm_resource_group.personal-iac-rg-1.name
 
-#   tags = {
-#     environment = "prod"
-#   }
-# }
+  tags = {
+    environment = "prod"
+  }
+}
 
-# resource "azurerm_network_security_rule" "personal-iac-sec-rule-1" {
-#   name                        = "${var.security_rule_1_name}"
-#   priority                    = 100
-#   direction                   = "Inbound"                             # Azure uses deny by default
-#   access                      = "Allow"
-#   protocol                    = "*"
-#   source_port_range           = "*"
-#   destination_port_range      = "*"
-#   source_address_prefix       = "${var.security_rule_1_source_ip}"   # Restrict to IP
-#   destination_address_prefix  = "*"
-#   resource_group_name         = azurerm_resource_group.personal-iac-rg-1.name
-#   network_security_group_name = azurerm_network_security_group.personal-iac-sg-1.name
-# }
+resource "azurerm_network_security_rule" "personal-iac-sec-rule-1" {
+  name                        = "${var.security_rule_1_name}"
+  priority                    = 100
+  direction                   = "Inbound"                             # Azure uses deny by default
+  access                      = "Allow"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "${var.security_rule_1_source_ip}"   # Restrict to IP
+  destination_address_prefix  = "*"
+  resource_group_name         = azurerm_resource_group.personal-iac-rg-1.name
+  network_security_group_name = azurerm_network_security_group.personal-iac-sg-1.name
+}
 
-# resource "azurerm_subnet_network_security_group_association" "personal-iac-sga-1" {
-#   subnet_id                 = azurerm_subnet.personal-iac-subnet-1.id
-#   network_security_group_id = azurerm_network_security_group.personal-iac-sg-1.id
-# }
+resource "azurerm_subnet_network_security_group_association" "personal-iac-sga-1" {
+  subnet_id                 = azurerm_subnet.personal-iac-subnet-1.id
+  network_security_group_id = azurerm_network_security_group.personal-iac-sg-1.id
+}
 
-# resource "azurerm_public_ip" "personal-iac-ip-1" {
-#   name                = "${var.public_ip_name}"
-#   resource_group_name = azurerm_resource_group.personal-iac-rg-1.name
-#   location            = azurerm_resource_group.personal-iac-rg-1.location
-#   allocation_method   = "Dynamic"
+resource "azurerm_public_ip" "personal-iac-ip-1" {
+  name                = "${var.public_ip_name}"
+  resource_group_name = azurerm_resource_group.personal-iac-rg-1.name
+  location            = azurerm_resource_group.personal-iac-rg-1.location
+  allocation_method   = "Dynamic"
 
-#   tags = {
-#     environment = "prod"
-#   }
-# }
+  tags = {
+    environment = "prod"
+  }
+}
 
-# resource "azurerm_network_interface" "personal-iac-nic-1" {
-#   name                = "${var.network_interface_name}"
-#   resource_group_name = azurerm_resource_group.personal-iac-rg-1.name
-#   location            = azurerm_resource_group.personal-iac-rg-1.location
+resource "azurerm_network_interface" "personal-iac-nic-1" {
+  name                = "${var.network_interface_name}"
+  resource_group_name = azurerm_resource_group.personal-iac-rg-1.name
+  location            = azurerm_resource_group.personal-iac-rg-1.location
 
-#   ip_configuration {
-#     name                          = "internal"
-#     subnet_id                     = azurerm_subnet.personal-iac-subnet-1.id
-#     private_ip_address_allocation = "Dynamic"
-#     public_ip_address_id          = azurerm_public_ip.personal-iac-ip-1.id
-#   }
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.personal-iac-subnet-1.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.personal-iac-ip-1.id
+  }
 
-#   tags = {
-#     environment = "prod"
-#   }
-# }
+  tags = {
+    environment = "prod"
+  }
+}
 
-# resource "azurerm_linux_virtual_machine" "personal-iac-vm-1" {
-#   name                = "${var.vm_name}"
-#   resource_group_name = azurerm_resource_group.personal-iac-rg-1.name
-#   location            = azurerm_resource_group.personal-iac-rg-1.location
-#   size                = "${var.vm_size}"
-#   admin_username      = "${var.vm_admin_username}"
-#   network_interface_ids = [
-#     azurerm_network_interface.personal-iac-nic-1.id
-#   ]
+resource "azurerm_linux_virtual_machine" "personal-iac-vm-1" {
+  name                = "${var.vm_name}"
+  resource_group_name = azurerm_resource_group.personal-iac-rg-1.name
+  location            = azurerm_resource_group.personal-iac-rg-1.location
+  size                = "${var.vm_size}"
+  admin_username      = "${var.vm_admin_username}"
+  network_interface_ids = [
+    azurerm_network_interface.personal-iac-nic-1.id
+  ]
 
-#   admin_ssh_key {
-#     username   = "${var.vm_admin_username}"
-#     public_key = file("${var.vm_ssh_key_location}")
-#   }
+  admin_ssh_key {
+    username   = "${var.vm_admin_username}"
+    public_key = file("${var.vm_ssh_key_location}")
+  }
 
-#   os_disk {
-#     caching              = "ReadWrite"
-#     storage_account_type = "Standard_LRS"
-#   }
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
 
-#   source_image_reference {
-#     publisher = "${var.vm_image_publisher}"
-#     offer     = "${var.vm_image_offer}"
-#     sku       = "${var.vm_image_sku}"
-#     version   = "${var.vm_image_version}"
-#   }
+  source_image_reference {
+    publisher = "${var.vm_image_publisher}"
+    offer     = "${var.vm_image_offer}"
+    sku       = "${var.vm_image_sku}"
+    version   = "${var.vm_image_version}"
+  }
 
-#   tags = {
-#     environment = "prod"
-#   }
-# }
+  tags = {
+    environment = "prod"
+  }
+}
 
 # # Ansible Section
 
