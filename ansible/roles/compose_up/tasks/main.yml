@@ -8,32 +8,36 @@
 - name: Check if {{ stack_name }} requires .env file
   delegate_to: localhost
   stat:
-    path: "~/personal-iac/docker/{{ stack_name }}/.env"
+    path: "./docker/{{ stack_name }}/.env"
   register: env_file
 
 - name: Copy {{ stack_name }} .env to remote host
   ansible.builtin.copy:
-    src: "~/personal-iac/docker/{{ stack_name }}/.env"
+    src: "./docker/{{ stack_name }}/.env"
     dest: "~/{{ stack_name }}/.env"
     mode: 0644
   when: env_file.stat.exists
 
+- name: Set playbook_dir to current working directory
+  set_fact:
+    playbook_dir: "{{ lookup('pipe', 'pwd') }}"
+
 - name: Copy {{ stack_name }} compose.yml to remote host
   ansible.builtin.copy:
-    src: "~/personal-iac/docker/{{ stack_name }}/compose.yml"
+    src: "{{ playbook_dir }}/../docker/{{ stack_name }}/compose.yml"
     dest: "~/{{ stack_name }}/compose.yml"
     mode: 0755
 
 - name: Check if {{ stack_name }}/data exists on host
   delegate_to: localhost
   stat:
-    path: "~/personal-iac/docker/{{ stack_name }}/data"
+    path: "{{ playbook_dir }}/../docker/{{ stack_name }}/data"
   register: data_dir
  
 - name: Find files in {{ stack_name }}/data
   delegate_to: localhost
   find:
-    paths: "~/personal-iac/docker/{{ stack_name }}/data"
+    paths: "{{ playbook_dir }}/../docker/{{ stack_name }}/data"
     recurse: yes
   register: files_to_copy
   when: data_dir.stat.exists
