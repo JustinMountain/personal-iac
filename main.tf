@@ -8,6 +8,10 @@ terraform {
       version = "~> 1.3.0"
       source  = "ansible/ansible"
     }
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.5.0"
+    }
   }
 
   backend "azurerm" {
@@ -21,6 +25,10 @@ provider "azurerm" {
   use_oidc = true
   features {}
 }
+
+provider "ansible" {}
+
+provider "local" {}
 
 resource "azurerm_resource_group" "personal-iac-rg-1" {
   name     = var.resource_group_name
@@ -138,11 +146,49 @@ resource "azurerm_linux_virtual_machine" "personal-iac-vm-1" {
   }
 }
 
-# # Ansible Section
+# Ansible Section
 
 resource "time_sleep" "wait_30_seconds" {
   depends_on      = [azurerm_linux_virtual_machine.personal-iac-vm-1]
   create_duration = "30s"
+}
+
+data "azurerm_storage_account" "existing" {
+  name                = var.storage_account_name
+  resource_group_name = var.storage_resource_group_name
+}
+
+data "azurerm_storage_container" "existing" {
+  name                 = var.container_name
+  storage_account_name = data.azurerm_storage_account.existing.name
+}
+
+resource "local_file" "ansible_inventory" {
+  content = yamlencode({
+    webservers = {
+      hosts = {
+        "${azurerm_linux_virtual_machine.personal-iac-vm-1.name}" = {
+          ansible_host = azurerm_linux_virtual_machine.personal-iac-vm-1.public_ip_address
+          ansible_user = var.vm_admin_username
+        }
+      }
+    }
+  })
+  filename = "${path.module}/inventory.yml"
+
+  provisioner "local-exec" {
+    command = "cat ${self.filename}"
+  }
+}
+
+resource "azurerm_storage_blob" "ansible_inventory" {
+  name                   = "inventory.yml"
+  storage_account_name   = data.azurerm_storage_account.existing.name
+  storage_container_name = data.azurerm_storage_container.existing.name
+  type                   = "Block"
+  source                 = local_file.ansible_inventory.filename
+
+  depends_on = [time_sleep.wait_30_seconds]
 }
 
 resource "ansible_host" "azure_instance" {
@@ -156,13 +202,13 @@ resource "ansible_host" "azure_instance" {
   depends_on = [time_sleep.wait_30_seconds]
 }
 
-resource "terraform_data" "ansible_inventory" {
-  provisioner "local-exec" {
-    command = "ansible-inventory -i ./ansible/inventory.yml --graph"
-  }
+# resource "terraform_data" "ansible_inventory" {
+#   provisioner "local-exec" {
+#     command = "ansible-inventory -i ./ansible/inventory.yml --graph"
+#   }
 
-  depends_on = [ansible_host.azure_instance]
-}
+#   depends_on = [ansible_host.azure_instance]
+# }
 
 data "local_file" "ansible_playbook" {
   filename = "./ansible/webservers.yml"
@@ -189,10 +235,17 @@ resource "null_resource" "ansible_playbook" {
   }
 
   provisioner "local-exec" {
-    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./ansible/inventory.yml ./ansible/webservers.yml"
+    command = <<-EOT
+      az storage blob download --account-name ${var.storage_account_name} \
+                                --container-name ${var.container_name} \
+                                --name inventory.yml \
+                                --file ./ansible/inventory.yml \
+                                --auth-mode login
+      ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./ansible/inventory.yml ./ansible/webservers.yml
+    EOT
   }
 
-  depends_on = [terraform_data.ansible_inventory]
+  depends_on = [azurerm_storage_blob.ansible_inventory]
 }
 
 # Creates a data object in the state file for reference
