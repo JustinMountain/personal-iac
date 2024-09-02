@@ -1,5 +1,5 @@
 ---
-- hosts: webservers
+- hosts: all
   roles:
     - role: geerlingguy.docker
       become: yes
