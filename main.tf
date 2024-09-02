@@ -182,10 +182,10 @@ data "local_file" "watchtower_compose" {
 
 resource "null_resource" "ansible_playbook" {
   triggers = {
-    playbook_hash = data.local_file.ansible_playbook.content_md5
-    traefik_hash  = data.local_file.traefik_compose.content_md5
-    blog_hash  = data.local_file.blog_compose.content_md5
-    watchtower_hash  = data.local_file.watchtower_compose.content_md5
+    playbook_hash   = data.local_file.ansible_playbook.content_md5
+    traefik_hash    = data.local_file.traefik_compose.content_md5
+    blog_hash       = data.local_file.blog_compose.content_md5
+    watchtower_hash = data.local_file.watchtower_compose.content_md5
   }
 
   provisioner "local-exec" {
