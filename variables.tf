@@ -91,7 +91,7 @@ variable "vm_image_version" {
 }
 
 # Ansible
-variable "ssh_private_key_location" {
-  type    = string
-  default = "~/.ssh/azurekey"
+variable "ssh_private_key_content" {
+  type      = string
+  sensitive = true
 }
