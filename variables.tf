@@ -69,9 +69,9 @@ variable "vm_admin_username" {
   type    = string
   default = "adminuser"
 }
-variable "vm_ssh_key_location" {
-  type    = string
-  default = "~/.ssh/exampleazurekey.pub"
+variable "vm_ssh_public_key" {
+  type      = string
+  sensitive = true
 }
 variable "vm_image_publisher" {
   type    = string
@@ -93,5 +93,5 @@ variable "vm_image_version" {
 # Ansible
 variable "ssh_private_key_location" {
   type    = string
-  default = "~/.ssh/exampleazurekey"
+  default = "~/.ssh/azurekey"
 }
