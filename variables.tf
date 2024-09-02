@@ -91,6 +91,18 @@ variable "vm_image_version" {
 }
 
 # Ansible
+variable "storage_account_name" {
+  description = "Name of the existing Azure Storage Account"
+  type        = string
+}
+variable "storage_resource_group_name" {
+  description = "Name of the resource group containing the storage account"
+  type        = string
+}
+variable "container_name" {
+  description = "Name of the existing container in the Azure Storage Account"
+  type        = string
+}
 variable "ssh_private_key_content" {
   type      = string
   sensitive = true
