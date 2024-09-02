@@ -150,7 +150,7 @@ resource "ansible_host" "azure_instance" {
   groups = ["webservers"]
   variables = {
     ansible_user                 = "${var.vm_admin_username}"
-    ansible_ssh_private_key_file = "${var.ssh_private_key_location}"
+    ansible_ssh_private_key_file = "${var.ssh_private_key_content}"
   }
 
   depends_on = [time_sleep.wait_30_seconds]
