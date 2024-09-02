@@ -33,6 +33,9 @@ jobs:
         name: "Print Ansible version"
         run: ansible-playbook --version
       -
+        name: Install geerlingguy.docker role
+        run: ansible-galaxy role install geerlingguy.docker
+      -
         name: Log into Azure with OIDC integration
         uses: azure/login@v1
         with:
