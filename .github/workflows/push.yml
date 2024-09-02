@@ -92,6 +92,9 @@ jobs:
         name: Terraform apply
         id: apply
         env:
+          TF_VAR_storage_account_name: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          TF_VAR_container_name: ${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}
+          TF_VAR_storage_resource_group_name: ${{ secrets.AZURE_STORAGE_RESOURCE_GROUP_NAME }}
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
