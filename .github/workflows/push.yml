@@ -24,6 +24,15 @@ jobs:
         name: Install the Terraform CLI
         uses: hashicorp/setup-terraform@v2
       -
+        name: Install Ansible
+        shell: bash
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+      -
+        name: "Print Ansible version"
+        run: ansible-playbook --version
+      -
         name: Log into Azure with OIDC integration
         uses: azure/login@v1
         with:

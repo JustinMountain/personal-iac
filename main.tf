@@ -4,10 +4,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "=3.7.0"
     }
-    # ansible = {
-    #   version = "~> 1.3.0"
-    #   source  = "ansible/ansible"
-    # }
+    ansible = {
+      version = "~> 1.3.0"
+      source  = "ansible/ansible"
+    }
   }
 
   backend "azurerm" {
@@ -140,67 +140,67 @@ resource "azurerm_linux_virtual_machine" "personal-iac-vm-1" {
 
 # # Ansible Section
 
-# resource "time_sleep" "wait_30_seconds" {
-#   depends_on      = [azurerm_linux_virtual_machine.personal-iac-vm-1]
-#   create_duration = "30s"
-# }
+resource "time_sleep" "wait_30_seconds" {
+  depends_on      = [azurerm_linux_virtual_machine.personal-iac-vm-1]
+  create_duration = "30s"
+}
 
-# resource "ansible_host" "azure_instance" {
-#   name   = azurerm_linux_virtual_machine.personal-iac-vm-1.public_ip_address
-#   groups = ["webservers"]
-#   variables = {
-#     ansible_user                 = "${var.vm_admin_username}"
-#     ansible_ssh_private_key_file = "${var.ssh_private_key_location}"
-#   }
+resource "ansible_host" "azure_instance" {
+  name   = azurerm_linux_virtual_machine.personal-iac-vm-1.public_ip_address
+  groups = ["webservers"]
+  variables = {
+    ansible_user                 = "${var.vm_admin_username}"
+    ansible_ssh_private_key_file = "${var.ssh_private_key_location}"
+  }
 
-#   depends_on = [time_sleep.wait_30_seconds]
-# }
+  depends_on = [time_sleep.wait_30_seconds]
+}
 
-# resource "terraform_data" "ansible_inventory" {
-#   provisioner "local-exec" {
-#     command = "ansible-inventory -i ./ansible/inventory.yml --graph"
-#   }
+resource "terraform_data" "ansible_inventory" {
+  provisioner "local-exec" {
+    command = "ansible-inventory -i ./ansible/inventory.yml --graph"
+  }
 
-#   depends_on = [ansible_host.azure_instance]
-# }
+  depends_on = [ansible_host.azure_instance]
+}
 
-# data "local_file" "ansible_playbook" {
-#   filename = "./ansible/webservers.yml"
-# }
+data "local_file" "ansible_playbook" {
+  filename = "./ansible/webservers.yml"
+}
 
-# data "local_file" "traefik_compose" {
-#   filename = "./docker/traefik/compose.yml"
-# }
+data "local_file" "traefik_compose" {
+  filename = "./docker/traefik/compose.yml"
+}
 
-# data "local_file" "blog_compose" {
-#   filename = "./docker/blog/compose.yml"
-# }
+data "local_file" "blog_compose" {
+  filename = "./docker/blog/compose.yml"
+}
 
-# data "local_file" "watchtower_compose" {
-#   filename = "./docker/watchtower/compose.yml"
-# }
+data "local_file" "watchtower_compose" {
+  filename = "./docker/watchtower/compose.yml"
+}
 
-# resource "null_resource" "ansible_playbook" {
-#   triggers = {
-#     playbook_hash = data.local_file.ansible_playbook.content_md5
-#     traefik_hash  = data.local_file.traefik_compose.content_md5
-#     blog_hash  = data.local_file.blog_compose.content_md5
-#     watchtower_hash  = data.local_file.watchtower_compose.content_md5
-#   }
+resource "null_resource" "ansible_playbook" {
+  triggers = {
+    playbook_hash = data.local_file.ansible_playbook.content_md5
+    traefik_hash  = data.local_file.traefik_compose.content_md5
+    blog_hash  = data.local_file.blog_compose.content_md5
+    watchtower_hash  = data.local_file.watchtower_compose.content_md5
+  }
 
-#   provisioner "local-exec" {
-#     command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./ansible/inventory.yml ./ansible/webservers.yml"
-#   }
+  provisioner "local-exec" {
+    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./ansible/inventory.yml ./ansible/webservers.yml"
+  }
 
-#   depends_on = [terraform_data.ansible_inventory]
-# }
+  depends_on = [terraform_data.ansible_inventory]
+}
 
-# # Creates a data object in the state file for reference
-# data "azurerm_public_ip" "personal-iac-ip-1-data" {
-#   name                = azurerm_public_ip.personal-iac-ip-1.name
-#   resource_group_name = azurerm_resource_group.personal-iac-rg-1.name
-# }
+# Creates a data object in the state file for reference
+data "azurerm_public_ip" "personal-iac-ip-1-data" {
+  name                = azurerm_public_ip.personal-iac-ip-1.name
+  resource_group_name = azurerm_resource_group.personal-iac-rg-1.name
+}
 
-# output "public_ip_address" {
-#   value = "${azurerm_linux_virtual_machine.personal-iac-vm-1.name}: ${data.azurerm_public_ip.personal-iac-ip-1-data.ip_address}"
-# }
+output "public_ip_address" {
+  value = "${azurerm_linux_virtual_machine.personal-iac-vm-1.name}: ${data.azurerm_public_ip.personal-iac-ip-1-data.ip_address}"
+}
