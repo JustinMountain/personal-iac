@@ -36,6 +36,15 @@ jobs:
         name: Install geerlingguy.docker role
         run: ansible-galaxy role install geerlingguy.docker
       -
+        name: Install community.general collection
+        run: ansible-galaxy collection install community.general
+      -
+        name: Install cloud.terraform collection
+        run: ansible-galaxy collection install cloud.terraform
+      -
+        name: Install azure.azcollection collection
+        run: ansible-galaxy collection install azure.azcollection
+      -
         name: Log into Azure with OIDC integration
         uses: azure/login@v1
         with:
@@ -65,17 +74,17 @@ jobs:
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: terraform init -upgrade -backend-config="storage_account_name=$STORAGE_ACCOUNT" -backend-config="container_name=$CONTAINER_NAME" -backend-config="resource_group_name=$RESOURCE_GROUP_NAME"
       -
-        name: Terraform Unlock
-        id: Unlock
-        env:
-          STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-          CONTAINER_NAME: ${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}
-          RESOURCE_GROUP_NAME: ${{ secrets.AZURE_STORAGE_RESOURCE_GROUP_NAME }}
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: terraform force-unlock -force 43ce27ff-bb99-03e4-eb68-aad316b32f3f
-      -
+      #   name: Terraform Unlock
+      #   id: Unlock
+      #   env:
+      #     STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+      #     CONTAINER_NAME: ${{ secrets.AZURE_STORAGE_CONTAINER_NAME }}
+      #     RESOURCE_GROUP_NAME: ${{ secrets.AZURE_STORAGE_RESOURCE_GROUP_NAME }}
+      #     ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      #     ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      #     ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      #   run: terraform force-unlock -force 43ce27ff-bb99-03e4-eb68-aad316b32f3f
+      # -
         name: Terraform format
         id: fmt
         run: terraform fmt -check
