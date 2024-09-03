@@ -107,3 +107,13 @@ variable "ssh_private_key_content" {
   type      = string
   sensitive = true
 }
+
+# Porkbun
+variable "porkbun_secret_api_key" {
+  type      = string
+  sensitive = true
+}
+variable "porkbun_api_key" {
+  type      = string
+  sensitive = true
+}

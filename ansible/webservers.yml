@@ -1,5 +1,8 @@
 ---
 - hosts: all
+  vars:
+    porkbun_secret_api_key: "{{ porkbun_secret_api_key }}"
+    porkbun_api_key: "{{ porkbun_api_key }}"
   roles:
     - role: geerlingguy.docker
       become: yes

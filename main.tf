@@ -197,6 +197,8 @@ resource "ansible_host" "azure_instance" {
   variables = {
     ansible_user                 = "${var.vm_admin_username}"
     ansible_ssh_private_key_file = "${var.ssh_private_key_content}"
+    porkbun_secret_api_key       = var.porkbun_secret_api_key
+    porkbun_api_key              = var.porkbun_api_key
   }
 
   depends_on = [time_sleep.wait_30_seconds]
@@ -245,7 +247,9 @@ resource "null_resource" "ansible_playbook" {
                                 --name inventory.yml \
                                 --file ./ansible/inventory.yml \
                                 --auth-mode login
-      ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./ansible/inventory.yml ./ansible/webservers.yml
+      ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./ansible/inventory.yml ./ansible/webservers.yml \
+        -e "porkbun_secret_api_key=${var.porkbun_secret_api_key}" \
+        -e "porkbun_api_key=${var.porkbun_api_key}"
     EOT
   }
 
