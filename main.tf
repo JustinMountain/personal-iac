@@ -247,9 +247,7 @@ resource "null_resource" "ansible_playbook" {
                                 --name inventory.yml \
                                 --file ./ansible/inventory.yml \
                                 --auth-mode login
-      ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./ansible/inventory.yml ./ansible/webservers.yml \
-        -e "porkbun_secret_api_key=${var.porkbun_secret_api_key}" \
-        -e "porkbun_api_key=${var.porkbun_api_key}"
+      ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ./ansible/inventory.yml ./ansible/webservers.yml
     EOT
   }
 
